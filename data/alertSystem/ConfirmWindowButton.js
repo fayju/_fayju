@@ -69,16 +69,12 @@ class ConfirmWindowButton extends fjPulseButton {
 							break;
 							case "chartboost":
 								if(GameSettingsData.GetInstance().chartBoostEnabled()){
-										#if UNITY_IPHONE
-									//IPHONEPLUGIN 	ChartBoostBinding.showMoreApps();
-										#endif
+									fjChartboostManager.GetInstance().MoreGames();
 								}
 							break;
 							case "chartboostinter":
 								if(GameSettingsData.GetInstance().chartBoostEnabled()){
-										#if UNITY_IPHONE
-									//IPHONEPLUGIN 	ChartBoostBinding.showInterstitial("alert");
-										#endif
+									fjChartboostManager.GetInstance().ShowInterstitial("alert");
 								}
 							break;
 							#if UNITY_IPHONE
@@ -187,7 +183,7 @@ class ConfirmWindowButton extends fjPulseButton {
 									case "chartboostinter":
 										if(GameSettingsData.GetInstance().chartBoostEnabled()){
 											#if UNITY_IPHONE
-										//IPHONEPLUGIN 	ChartBoostBinding.cacheInterstitial("alert");
+										  	//ChartBoostBinding.cacheInterstitial("alert");
 											#endif
 										}
 									break;

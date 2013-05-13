@@ -31,11 +31,18 @@ public class WindowSystem extends MonoBehaviour{
 	    } 
 	    return instance;
 	}
+	//WindowSystem.GetInstance().isWindowOpen();
+	function isWindowOpen():boolean{
+		return windowOpen;
+	}
 	function launchWindow(launchWindow:String ) {
 		launchWindow(launchWindow, false);
 	}
 	//eg monsters token purchase window WindowSystem.GetInstance().launchWindow("BuyTokenBook");
 	function launchWindow(resource:String, forceNew:boolean) {
+		
+		//deactivate otherlayers
+		
 		nextWindow = "";
 		//force pause on teh game
 		NotificationCenter.DefaultCenter().PostNotification(gameObject, "OnPauseGame");//a window is opening ensure game is paused
@@ -47,7 +54,8 @@ public class WindowSystem extends MonoBehaviour{
 				if(currentWindow != null){
 					currentWindow.SendMessage("deActivateWindow", SendMessageOptions.DontRequireReceiver);
 				}
-				windowOpen = false;
+				
+				//windowOpen = false;
 			 
 			}
 		//a window will take care of itself and should only be visible by itself as it carries its own camera 
@@ -65,7 +73,9 @@ public class WindowSystem extends MonoBehaviour{
 		if(currentWindow == null){
 			Debug.Log("window "+resource+"failed to create");
 		}else{
+			
 			windowOpen = true;
+			Debug.Log("windowOpen set to true");
 			NotificationCenter.DefaultCenter().PostNotification(gameObject, "OnLockInteraction");
 
 		}
@@ -95,12 +105,16 @@ public class WindowSystem extends MonoBehaviour{
 		return;
 		
 		currentWindow.SendMessage("deActivateWindow", SendMessageOptions.DontRequireReceiver);
-	  windowOpen = false;
-		
+	 
+	 
 			NotificationCenter.DefaultCenter().PostNotification(gameObject, "OnUnLockInteraction");
 		if(nextWindow != ""){
 			launchWindow(nextWindow);
-		}
+		}else{
+			Debug.Log("windowOpen set to false");
+			 
+			windowOpen = false;
+		} 
 		nextWindow = "";
 	 
 		

@@ -32,11 +32,12 @@ when game exits it will call the data again to refresh it
 	}
 	private var bundleVersion:String = "1.4";
 	private var isinited:boolean = false;
+	private var isloaded:boolean = false;
 	 var sessionId:String;
 	 var clientId:String;
 	 var interactionId:String;
 	 var campaignId:String;
-	
+	 var isFayjuGame:boolean = true;
 	private var lastPauseTime:float = 0.0;
 	private var MIN_TIME:float =  60.0 * 3.0;
 	private var defaultSettingsPath:String = "_data/settings";
@@ -66,7 +67,7 @@ when game exits it will call the data again to refresh it
 	private var alertsHandler:AlertsHandler;
 	private var blocksHandler:AdBlocksHandler;
 	function waitForLoaded(){
-		while(!isinited){
+		while(!isloaded){
 			yield;
 		}
 		
@@ -89,7 +90,7 @@ when game exits it will call the data again to refresh it
 		
 		isinited = true;
 		//init the object for the first time
-		//LoadSettingsFile();
+		LoadSettingsFile();
 	}
 	//GameSettingsData.GetInstance().SetTimeStamp(id);
 	function SetTimeStamp(stamp:String){
@@ -131,10 +132,14 @@ when game exits it will call the data again to refresh it
 			SetTimeStamp("lastLoadSettingsTimeStamp", true );
 			var settingsDataRaw:String = "";
 			//do we have internet access?
-			var dontconnect:boolean = true;
-			if (Application.internetReachability != NetworkReachability.NotReachable || dontconnect){
+			 
+			if (Application.internetReachability != NetworkReachability.NotReachable ){
 			//yes go get it and then yield wait for it
 				var form = new WWWForm();
+				var settingsjson:WWW;
+				if(isFayjuGame){
+					settingsjson = WWW(defaultUrl);
+				}else{
 			    //form.AddField("frameCount", Time.frameCount.ToString());
 				form.AddField("type", "live"); //- this is used for debugging or clean versions and we can set different values in the CMS based on this - 'live', 'debug' or 'clean'
 		 		form.AddField("udid", SystemInfo.deviceUniqueIdentifier);
@@ -158,8 +163,8 @@ when game exits it will call the data again to refresh it
 		// ======================
 		// = MONSTERS VARIABLES =
 		// ======================
-		    	var settingsjson = WWW(defaultUrl, form);
-				 
+		    	settingsjson = WWW(defaultUrl, form);
+				}
 	 			SetTimeStamp("serverConnectionTimeStamp", true);
 				while(!settingsjson.isDone && settingsjson.error==null && GetTimePassed("serverConnectionTimeStamp")< ServerConnectionTimeOut)
 		        {
@@ -167,15 +172,15 @@ when game exits it will call the data again to refresh it
 				}
 				
 				if (settingsjson.error != null){
-			        Debug.Log("error "+settingsjson.error);
-					 settingsDataRaw = GetLocalSettings();
+			        	Debug.Log("error "+settingsjson.error);
+					 	settingsDataRaw = GetLocalSettings();
 				}else{
 					if(!settingsjson.isDone){
-							Debug.Log("server Time out");
-							settingsDataRaw = GetLocalSettings();
+						Debug.Log("server Time out");
+						settingsDataRaw = GetLocalSettings();
 					}else{
-					Debug.Log("json from server");
-				 	settingsDataRaw = settingsjson.text;
+						Debug.Log("json from server");
+					 	settingsDataRaw = settingsjson.text;
 					}
 				}
 		    	
@@ -188,12 +193,10 @@ when game exits it will call the data again to refresh it
 		 
 			Debug.Log("parse "+settingsDataRaw);
 			//parse it
-			settingsData =  MiniJSON.jsonDecode(settingsDataRaw);
-			
+			settingsData =  MiniJSON.jsonDecode(settingsDataRaw);	
 			var isValid:boolean = true;
 			if (MiniJSON.lastDecodeSuccessful () && settingsData != null) {
-				
-				
+
 			}else{
 				Debug.Log("WARNING :: error decoding live json going local");
 					settingsDataRaw = GetLocalSettings();
@@ -277,6 +280,8 @@ when game exits it will call the data again to refresh it
 				}else{
 					Debug.Log("failed to get alert info");
 				}
+				
+				if(!isFayjuGame){
 				//set up tracking (this will need to be split to my tracking)
 				if(settingsData.ContainsKey("tracking") && settingsData.ContainsKey("rawplotEnabled") && settingsData.ContainsKey("rawplotCampaignID") && settingsData.ContainsKey("rawplotViewInteractionID")){
 					trackingHandler.tracking  = settingsData["tracking"] as ArrayList;//a list of tracking objects by names by location
@@ -286,9 +291,15 @@ when game exits it will call the data again to refresh it
 				}else{
 					Debug.Log("failed to get tracking info");
 				}
+			}else{
+				trackingHandler.tracking  = new ArrayList();
+				trackingHandler.rawplotEnabled = false;
+			}
 			//check it has what it needs if not go default
 			}
 			trackingHandler.TrackEvent();
+			
+			isloaded = true;
 			//done 
 	}
 	function chartBoostEnabled():boolean{
@@ -361,9 +372,7 @@ when game exits it will call the data again to refresh it
 				break;
 				case "chartboost":
 					if(GameSettingsData.GetInstance().chartBoostEnabled()){
-							#if UNITY_IPHONE
-							//IPHONEPLUGIN ChartBoostBinding.showMoreApps();
-							#endif
+						fjChartboostManager.GetInstance().MoreGames();
 					}
 					
 					
@@ -372,9 +381,7 @@ when game exits it will call the data again to refresh it
 				case "chartboostinter":
 				
 					if(GameSettingsData.GetInstance().chartBoostEnabled()){
-							#if UNITY_IPHONE
-							//IPHONEPLUGIN ChartBoostBinding.showInterstitial("block");
-							#endif
+							fjChartboostManager.GetInstance().ShowInterstitial("block");
 					}
 				break;
 					#if UNITY_IPHONE
@@ -416,17 +423,14 @@ when game exits it will call the data again to refresh it
 					#endif
 				case "chartboost":
 			      if(GameSettingsData.GetInstance().chartBoostEnabled()){
-			      		#if UNITY_IPHONE
-				 		//IPHONEPLUGIN   		ChartBoostBinding.showMoreApps();
-				    	#endif
+						fjChartboostManager.GetInstance().MoreGames();
+			      	 
 				    }
 
 				break;
 				case "chartboostinter":
 					if(GameSettingsData.GetInstance().chartBoostEnabled()){
-							#if UNITY_IPHONE
-							//IPHONEPLUGIN 		ChartBoostBinding.showInterstitial("moreGames");
-							#endif
+							 fjChartboostManager.GetInstance().ShowInterstitial("moreGames");
 					}
 				break;
 					case "external":
@@ -502,17 +506,15 @@ when game exits it will call the data again to refresh it
 			break;
 			case "chartboost":
 		      if(GameSettingsData.GetInstance().chartBoostEnabled()){
-		      		#if UNITY_IPHONE
-			 //IPHONEPLUGIN   		ChartBoostBinding.showMoreApps();
-			    	#endif
+		      	fjChartboostManager.GetInstance().MoreGames();
 			    }
 				
 			break;
 			case "chartboostinter":
 				if(GameSettingsData.GetInstance().chartBoostEnabled()){
-						#if UNITY_IPHONE
-				//IPHONEPLUGIN 		ChartBoostBinding.showInterstitial("moreGames");
-						#endif
+					 
+						fjChartboostManager.GetInstance().ShowInterstitial("moreGames");//IPHONEPLUGIN 
+						 
 				}
 			break;
 			case "external":

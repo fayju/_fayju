@@ -20,15 +20,16 @@ class TextDisplayParagraph extends MonoBehaviour{
 	var maxLines:int = 3;
 	var lineSpacing:float = 1.6;
 	private var maximumWidth:float;
-	var cropWidth:float = 11.0;
+	private var cropWidth:float = 11.0;
 	var drawScale:float = 0.035;
+	var maxCropWidth:float = 21;
 	//var minScale:float
 	var displayText:String = "some example text that is descriptive about something";
  	var lineWidth:float = 1;
  	var scaleTarget:Transform;
 var forceDraw:boolean = false;
 	function Start(){
-		 maximumWidth = Vector3.Distance(Vector3(bottomLeft.position.x, 0, bottomLeft.position.z), Vector3(topRight.position.x, 0, topRight.position.z) );
+		 maximumWidth = 1.8*Vector3.Distance(Vector3(bottomLeft.position.x, 0, bottomLeft.position.z), Vector3(topRight.position.x, 0, topRight.position.z) );
 	/*	if(Random.Range(0,12) < 6){
 
 		}else{
@@ -42,7 +43,7 @@ var forceDraw:boolean = false;
 	}
  
 	function updateText(txt:String){
-		 	maximumWidth = Vector3.Distance(Vector3(bottomLeft.position.x, 0, bottomLeft.position.z), Vector3(topRight.position.x, 0, topRight.position.z) );
+		 	maximumWidth = 1.8*Vector3.Distance(Vector3(bottomLeft.position.x, 0, bottomLeft.position.z), Vector3(topRight.position.x, 0, topRight.position.z) );
 			SplitToLines(txt, 3);
 	}
 	//0.73|0.7|0.66|0.7|0.68|0.66|0.65|0.7|0.4|0.58|0.68|0.59|0.8|0.7|0.81|0.72|0.82|0.66|0.64|0.64|0.72|0.74|0.95|0.66|0.66|0.72|0.73|0.7|0.66|0.7|0.68|0.66|0.65|0.7|0.4|0.58|0.68|0.59|0.8|0.7|0.81|0.66|0.82|0.66|0.64|0.64|0.72|0.6|0.3|0.5|0.6|0.3|0.74|0.48|0.72|0.7|0.68|0.72|0.7|0.68|0.7|0.7|0.4|1|1|1|0.66|1.0|1|1|1
@@ -62,18 +63,9 @@ var forceDraw:boolean = false;
 			Debug.Log("words "+i+" "+words[i]);
 			phraseWidth = phraseWidth+ myText.GetWordWidth(words[i], drawScale) + myText.getSpaceWidth(drawScale);
 		}
-		if(phraseWidth < 25){
-			cropWidth =phraseWidth;
-		}else{
-				if(phraseWidth < 40){
-					cropWidth =phraseWidth/2.0;
-				}else{
-			cropWidth =phraseWidth/3.0;
-		}
-		}
-		Debug.Log(cropWidth +" crop width");
-		if(cropWidth > 25){
-			cropWidth = 25;
+		cropWidth =phraseWidth/3.0;
+		if(cropWidth > maxCropWidth){
+			cropWidth = maxCropWidth;
 		}
 		Debug.Log("crop width "+cropWidth);
 			myText.transform.localScale = Vector3(1,1,1);
@@ -126,9 +118,6 @@ var forceDraw:boolean = false;
 					txtDisplay = myText;
 				}
 				txtDisplay.DrawText(lineTexts[i]);
-			}
-			if(numberOfLines < 3){
-				scaleTarget.position = scaleTarget.position - Vector3(0,0.5*(3 - (numberOfLines -1))*lineSpacing,0); 
 			}
 		if(maxPhraseWidth > maximumWidth){
 			//how much to scale down by?

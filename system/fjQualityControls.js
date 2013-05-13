@@ -30,6 +30,7 @@ protected var hideInterface:boolean = true;
 var isOUYA:boolean = true;//true to use ouya settings on android
 var isSuperLow:boolean = false;
 var isICadeActive:boolean = false;
+var displayClipping:boolean = false;
 //fjQualityControls.GetInstance().getSlowQuality();
 function getSlowQuality():boolean{
 	if(Application.isEditor)
@@ -70,13 +71,13 @@ function startQuality () {
 }
 function SetUpICade(){
 	
-	iCadeBinding.setActive( true );
+//	iCadeBinding.setActive( true );
 	isICadeActive = true;
 	
 }
 function UpdateICade(){
 	#if UNITY_IPHONE
-	iCadeBinding.updateState();
+//	iCadeBinding.updateState();
 	#endif
 }
 function checkMemory(){
@@ -429,23 +430,24 @@ function SetStartQuality(){
 											
 											
 					GUILayout.EndVertical ();
-									
-					GUILayout.BeginVertical ();
+					if(displayClipping){				
+						GUILayout.BeginVertical ();
 										
-										if (GUILayout.Button ("hideObj",   GUILayout.Height(buttonHeight)))
-										HideTagged();
+											if (GUILayout.Button ("hideObj",   GUILayout.Height(buttonHeight)))
+												HideTagged();
 											
-												if (GUILayout.Button ("showObj",   GUILayout.Height(buttonHeight)))
-													ShowTagged();
+											if (GUILayout.Button ("showObj",   GUILayout.Height(buttonHeight)))
+												ShowTagged();
 													
-													if (GUILayout.Button ("clipnear",   GUILayout.Height(buttonHeight)))
-														ClipCameraNear();
-														
-														if (GUILayout.Button ("clipfar",   GUILayout.Height(buttonHeight)))
-															ClipCameraFar();
+											if (GUILayout.Button ("clipnear",   GUILayout.Height(buttonHeight)))
+												ClipCameraNear();
+											
+											if (GUILayout.Button ("clipfar",   GUILayout.Height(buttonHeight)))
+												ClipCameraFar();
 											
 											
-					GUILayout.EndVertical ();
+						GUILayout.EndVertical ();
+					}
 					GUILayout.BeginVertical ();
 					if (GUILayout.Button ("hide UI",   GUILayout.Height(50))){
 							hideInterface = true;

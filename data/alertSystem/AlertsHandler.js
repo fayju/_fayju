@@ -334,10 +334,7 @@ class AlertsHandler extends MonoBehaviour{
 				}
 			break;
 			case "chartboostinter":
-				#if UNITY_IPHONE
-				  
-				//IPHONEPLUGIN ChartBoostBinding.showInterstitial(currentDisplayAlert["name"].ToString());
-				#endif
+				fjChartboostManager.GetInstance().ShowInterstitial(currentDisplayAlert["name"].ToString());
 			break;
 			case "tapjoyinter":
 				#if UNITY_IPHONE

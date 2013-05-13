@@ -91,7 +91,7 @@ function SetMainCamera(mainCameraGameObject:GameObject){
 		mainRayCastManager = mainCameraGameObject.AddComponent(RayCastManager) as RayCastManager;
 	}
 	//dynamically assign this?
-	mainRayCastManager.layerMask =   1 << 14;//this is for tapping objects
+	mainRayCastManager.layerMask =   1 << 8;// | 1 << 0;//this is for tapping objects
 }
 function SetInterfaceCamera(){
  
@@ -114,7 +114,7 @@ function SetInterfaceCamera(interfaceCameraGameObject:GameObject){
 		interfaceRayCastmanager = interfaceCameraGameObject.AddComponent(RayCastManager) as RayCastManager;
 	}
 	//dynamically assign this?
-	interfaceRayCastmanager.layerMask = 1 << 9 | 1 << 8;
+	interfaceRayCastmanager.layerMask = 1 << 10 | 1 << 11;
 }
 
 function touchCount():int
@@ -143,18 +143,23 @@ function updateTouches(){
 	//clearTouches();
 	var remainingTouches:ProxyTouch[] = touches();//get all of them
 	//filter them through , have they been spoken for?
-	if(remainingTouches.Length > 0){
+//	Debug.Log("is updating ");
+		if(!WindowSystem.GetInstance().isWindowOpen()){
+			if(remainingTouches.Length > 0){
 	 
-		if(interfaceRayCastmanager){
-			remainingTouches = interfaceRayCastmanager.updateTouch(remainingTouches ); 
-		}
-		//check in game window
-		if(mainRayCastManager){
-		  remainingTouches = mainRayCastManager.updateTouch(remainingTouches);
-		}
-		//is pinching?
+				if(interfaceRayCastmanager){
+					remainingTouches = interfaceRayCastmanager.updateTouch(remainingTouches ); 
+				}
+				//check in game window
+				if(mainRayCastManager){
+				  remainingTouches = mainRayCastManager.updateTouch(remainingTouches);
+				}
+				//is pinching?
 	 
-	}
+			}
+		}else{
+//			Debug.Log("window is open");
+		}
 	setTouches(remainingTouches);//this is so that they can be collected elsewhere
 
 }

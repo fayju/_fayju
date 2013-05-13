@@ -15,17 +15,17 @@ class fjAdBlockButton extends fjPulseButton{
  
 	private var definition:Hashtable = new Hashtable();
 	var location:String = "gameOverBox";
+	var startTexture:Texture;
 	var targetMaterial:Material;
 	var displayOnLoad:boolean = true;
 	private var isDisplayed:boolean = false;
 	var noLocalAd:boolean = true;
-	function Start():void{
-		/*	if(!useGUIDisable){
-			overrideHide = true;
-		}*/
+	private var alertIsReady:boolean = false;
+	function Start(){
+		
  		//set in visible
 		//targetRenderer.enabled = false;
-		
+		startTexture = targetMaterial.mainTexture;
 		GameSettingsData.GetInstance().init();
 		
 		NotificationCenter.DefaultCenter().AddObserver(gameObject, "OnLevelComplete");
@@ -33,14 +33,13 @@ class fjAdBlockButton extends fjPulseButton{
 		
 		
 		hideButton();
-		
+	
 		if(collider != null){
 			collider.enabled = false;
 		}
- 
-		definition=   AdBlocksHandler.GetInstance().GetBlock(location);//returns hashList
+ 	  
 		 
-		if(definition.ContainsKey("type")){
+		/*if(definition.ContainsKey("type")){
 			
 			if(definition["type"] == "chartboostinter"){
 						if(GameSettingsData.GetInstance().chartBoostEnabled()){
@@ -50,7 +49,7 @@ class fjAdBlockButton extends fjPulseButton{
 						}
 			}
 			
-		}
+		}*/
 	 
 				/*	{"campaign":"getgamenet",
 					"image":"http://images.gamenet.com/blocks/getgamenet1.png",
@@ -78,28 +77,67 @@ class fjAdBlockButton extends fjPulseButton{
 		
 		super.Start();
 		///check location if navigation hide
-		
-		if(displayOnLoad){
-			OnDisplayAd();
-		}
+		StartCoroutine("handleAd");
 
 	}
+	function OnDisable(){
+		 targetMaterial.mainTexture = startTexture;
+	}
+	function hideButton(){
+		if(!hidden){
+			var component:Component[] = scaleTarget.GetComponentsInChildren(Renderer, true);
+			for(var comp:Component in component){
+				var rend:Renderer = comp as Renderer;
+			 
+				rend.enabled = false;
+
+			}
+			collider.enabled = false;
+		  
+			hidden = true;
+		}
+	}
+	function handleAd(){
+ 	  	yield GameSettingsData.GetInstance().waitForLoaded();
+		definition=   AdBlocksHandler.GetInstance().GetBlock(location);//returns hashList
+		alertIsReady = true;
+		if(displayOnLoad){
+			//forceActive();
+			OnDisplayAd();
+		}
+		
+	}
+	function forceActive(){
+		gameObject.SetActive(true);
+	}
 	function OnLevelComplete(){
+		forceActive();
 		OnDisplayAd();
 		
 	}
 	function OnDisplayAd(){
+		//wait until game settings data is ready
+		if(!alertIsReady){
+			Debug.Log("alert not ready");
+		return;
+	}
 		AdBlocksHandler.GetInstance().incrBlockImpressions(location+"_freq");
 		Debug.Log("display alert");
 		if(isDisplayed){
 			return;
 		}
-		if(!definition)
-		return;
-		if(!definition.ContainsKey("campaign"))
-		return;
-		if(!definition.ContainsKey("impressions"))
-		return;
+		if(!definition){
+			Debug.Log("no definition");
+			return;
+		}
+		if(!definition.ContainsKey("campaign")){
+			Debug.Log("no campaign");
+			return;
+		}
+		if(!definition.ContainsKey("impressions")){
+			Debug.Log("no impressions");
+			return;
+		}
 			Debug.Log("imp "+(definition["impressions"]));
 	 		AdBlocksHandler.GetInstance().ShowBlock(location, definition["campaign"], definition["impressions"] );// as String == "default");//an
 		 
@@ -107,6 +145,7 @@ class fjAdBlockButton extends fjPulseButton{
 		if(definition.ContainsKey("image") || definition.ContainsKey("localimage") ){
 			var isShown:boolean = false;
 			if(	definition.ContainsKey("image")){
+				
 						var www : WWW =  new WWW(definition["image"]);  //"http://www.fayju.com/blog/wp-content/uploads/2012/10/test.png"
 
 			     		Debug.Log("loading image "+definition["image"]);

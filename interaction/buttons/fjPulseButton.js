@@ -12,7 +12,7 @@ class fjPulseButton extends InteractiveGameObject{
  
  
 	var isOn:boolean = false;
-	private var hidden:boolean = false;
+	protected var hidden:boolean = false;
 	var oneTouch:boolean = true;
 	private var useTrigger:boolean = true;
 	

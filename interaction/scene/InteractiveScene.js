@@ -71,7 +71,7 @@ class InteractiveScene extends MonoBehaviour{
 
 	}
 	function StartPostLoad():void{
-		
+		/*
 			var mainCam:GameObject = Definitions.GetInstance().MainCamera();
 			if(mainCam != null){
 				mainCamera = mainCam.transform;
@@ -109,8 +109,8 @@ class InteractiveScene extends MonoBehaviour{
 		}else{
 			useInterface = false;
 		}
-		
-		
+		*/
+		useInterface = false;
 		forceStartGame = true;
 	}
 	// =========================
@@ -131,7 +131,7 @@ class InteractiveScene extends MonoBehaviour{
 	function ProcessTouches():void{
 
 		//gather touches
-	 
+		/*
 		var remainingTouches:ProxyTouch[] =ProxyTouchManager.DefaultManager().touches();;//Input.touches;
 
 		//distribute to raycasters
@@ -152,7 +152,7 @@ class InteractiveScene extends MonoBehaviour{
 				excessTouches++;
 			}
 		}
-		
+		*/
 	}
 	function FixedUpdate(){
 			if(GameReady){

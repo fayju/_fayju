@@ -255,20 +255,12 @@ class AdBlocksHandler extends MonoBehaviour{
 						Debug.Log("reset blocks ");
 						resetBlockImpressions(location+"_freq");
 					}
-						
-						
-						if(getBlockImpressions(location+"_freq") == freq){//first time it will be
-							 
-								//show it
-								
 
-						 
+						if(getBlockImpressions(location+"_freq") == freq){//first time it will be	 
+								//show it
 						}else{
-						 
-							
 								Debug.Log("to frequent "+location);
 								return defaultBlock();
-						 
 						}
 				}
 			}
@@ -277,7 +269,6 @@ class AdBlocksHandler extends MonoBehaviour{
 				return defaultBlock();
 			}
 
-			
 			var blockList:ArrayList = blockGroup["blockDefinitions"] as ArrayList;
 			if(blockList.Count < 1){
 			 
@@ -292,13 +283,9 @@ class AdBlocksHandler extends MonoBehaviour{
 			 var currentBlockOrder:int = PlayerPrefs.GetInt( "currentBlockOrder_"+location, 0);
 			 var priorityRandomArray:ArrayList = selectionList[location] as ArrayList;
 			if(priorityRandomArray.Count > currentBlockOrder){
-				
-				
-				
-				
+	
 			var selectedName:String = priorityRandomArray[currentBlockOrder];
-			
-			 
+
 			for(i = 0; i < blockList.Count; i++){
 			
 					//find the next alert that can display
